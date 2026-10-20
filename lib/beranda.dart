@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'app_bottom_navigation.dart';
 import 'masuk.dart';
 
 const _ink = Color(0xFF102D2F);
@@ -14,8 +15,6 @@ class BerandaPage extends StatefulWidget {
 }
 
 class _BerandaPageState extends State<BerandaPage> {
-  int _selectedTab = 0;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,7 +56,7 @@ class _BerandaPageState extends State<BerandaPage> {
                 ),
               ),
             ),
-            _buildBottomNavigation(),
+            const AppBottomNavigation(currentIndex: 0),
           ],
         ),
       ),
@@ -419,70 +418,6 @@ class _BerandaPageState extends State<BerandaPage> {
           ),
           const Icon(Icons.chevron_right, color: Color(0xFF829596), size: 18),
         ],
-      ),
-    );
-  }
-
-  Widget _buildBottomNavigation() {
-    const tabs = [
-      (label: 'Beranda', icon: Icons.home_outlined, active: Icons.home),
-      (
-        label: 'Jadwal',
-        icon: Icons.calendar_month_outlined,
-        active: Icons.calendar_month,
-      ),
-      (label: 'Riwayat', icon: Icons.history, active: Icons.history),
-      (label: 'Evaluasi', icon: Icons.article_outlined, active: Icons.article),
-      (label: 'Profil', icon: Icons.person_outline, active: Icons.person),
-    ];
-
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Color(0xFFE0E8E8))),
-      ),
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          height: 51,
-          child: Row(
-            children: [
-              for (var index = 0; index < tabs.length; index++)
-                Expanded(
-                  child: InkWell(
-                    onTap: () => setState(() => _selectedTab = index),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          _selectedTab == index
-                              ? tabs[index].active
-                              : tabs[index].icon,
-                          size: 19,
-                          color: _selectedTab == index
-                              ? _teal
-                              : const Color(0xFF657879),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          tabs[index].label,
-                          style: TextStyle(
-                            color: _selectedTab == index
-                                ? _teal
-                                : const Color(0xFF657879),
-                            fontSize: 8,
-                            fontWeight: _selectedTab == index
-                                ? FontWeight.w700
-                                : FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
       ),
     );
   }
