@@ -326,8 +326,8 @@ class _LoginRiwayatPageState extends State<LoginRiwayatPage> {
       child: Row(
         children: [
           Container(
-            width: 25,
-            height: 29,
+            width: 34,
+            height: 42,
             decoration: BoxDecoration(
               color: const Color(0xFFEEF3F3),
               borderRadius: BorderRadius.circular(6),

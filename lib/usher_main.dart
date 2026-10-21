@@ -193,8 +193,8 @@ class UsherMainPage extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 29,
-                height: 31,
+                width: 48,
+                height: 52,
                 decoration: BoxDecoration(
                   color: service.isActive ? _teal : const Color(0xFFEEF3F3),
                   borderRadius: BorderRadius.circular(7),

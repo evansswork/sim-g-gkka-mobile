@@ -29,7 +29,17 @@ class MainApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF006F77)),
         useMaterial3: true,
       ),
-      home: const BerandaPage(),
+      builder: (context, child) {
+        final mediaQuery = MediaQuery.of(context);
+        final systemScale = mediaQuery.textScaler.scale(1);
+        return MediaQuery(
+          data: mediaQuery.copyWith(
+            textScaler: TextScaler.linear(systemScale * 1.4),
+          ),
+          child: child!,
+        );
+      },
+      home: const LoginBerandaPage(),
       routes: {
         '/beranda': (_) => const BerandaPage(),
         '/jadwal': (_) => const JadwalPage(),

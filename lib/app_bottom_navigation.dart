@@ -54,7 +54,7 @@ class AppBottomNavigation extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: SizedBox(
-          height: 51,
+          height: 60,
           child: Row(
             children: [
               for (var index = 0; index < tabs.length; index++)
@@ -73,12 +73,12 @@ class AppBottomNavigation extends StatelessWidget {
                           currentIndex == index
                               ? tabs[index].active
                               : tabs[index].icon,
-                          size: 19,
+                          size: 22,
                           color: currentIndex == index
                               ? const Color(0xFF006F77)
                               : const Color(0xFF657879),
                         ),
-                        const SizedBox(height: 2),
+                        const SizedBox(height: 4),
                         Text(
                           tabs[index].label,
                           style: TextStyle(
@@ -112,7 +112,7 @@ class LoginButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: 34,
+      height: 40,
       child: FilledButton(
         onPressed: () => Navigator.of(context).pushNamed('/masuk'),
         style: FilledButton.styleFrom(

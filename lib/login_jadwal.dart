@@ -206,8 +206,8 @@ class _LoginJadwalPageState extends State<LoginJadwalPage> {
       child: Row(
         children: [
           Container(
-            width: 28,
-            height: 31,
+            width: 36,
+            height: 44,
             decoration: BoxDecoration(
               color: isUpcoming ? _teal : const Color(0xFFEEF3F3),
               borderRadius: BorderRadius.circular(7),
