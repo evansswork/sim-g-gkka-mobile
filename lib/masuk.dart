@@ -12,14 +12,14 @@ class MasukPage extends StatefulWidget {
 
 class _MasukPageState extends State<MasukPage> {
   final _formKey = GlobalKey<FormState>();
-  final _phoneController = TextEditingController();
+  final _identifierController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _sedangLogin = false;
 
   @override
   void dispose() {
-    _phoneController.dispose();
+    _identifierController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -45,24 +45,25 @@ class _MasukPageState extends State<MasukPage> {
                 const Text('Masuk', style: Teks.judulBesar),
                 const SizedBox(height: 8),
                 Text(
-                  'Gunakan no. HP yang terdaftar di sekretariat gereja.',
+                  'Gunakan no. HP atau email yang terdaftar di sekretariat gereja.',
                   style: Teks.isi.copyWith(color: Warna.teksKedua),
                 ),
                 const SizedBox(height: 20),
                 IsianForm(
-                  label: 'No. HP',
+                  label: 'No. HP atau email',
                   child: TextFormField(
-                    controller: _phoneController,
-                    keyboardType: TextInputType.phone,
+                    controller: _identifierController,
+                    keyboardType: TextInputType.emailAddress,
+                    autocorrect: false,
                     textInputAction: TextInputAction.next,
                     style: Teks.isi,
                     decoration: gayaInput(
-                      hint: '08xx-xxxx-xxxx',
-                      ikon: Icons.chat_bubble_outline,
+                      hint: '08xx-xxxx-xxxx atau nama@email.com',
+                      ikon: Icons.person_outline,
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'No. HP wajib diisi.';
+                        return 'No. HP atau email wajib diisi.';
                       }
                       return null;
                     },
@@ -160,13 +161,16 @@ class _MasukPageState extends State<MasukPage> {
     if (_sedangLogin) return;
     if (!_formKey.currentState!.validate()) return;
 
-    // buang spasi & strip: "0812-3456 7890" -> "081234567890"
-    final noHp = _phoneController.text.replaceAll(RegExp(r'[\s-]'), '');
+    // backend mencocokkan teks persis: no. HP dibuang spasi & strip-nya
+    // ("0812-3456 7890" -> "081234567890"), email/kode jemaat cukup di-trim
+    final isian = _identifierController.text.trim();
+    final noHp = RegExp(r'^\+?[\d\s-]+$').hasMatch(isian);
+    final identifier = noHp ? isian.replaceAll(RegExp(r'[\s-]'), '') : isian;
     final password = _passwordController.text;
 
     setState(() => _sedangLogin = true);
     try {
-      await AuthService.login(noHp, password);
+      await AuthService.login(identifier, password);
       if (!mounted) return;
       Navigator.of(context)
           .pushNamedAndRemoveUntil('/login-beranda', (_) => false);
