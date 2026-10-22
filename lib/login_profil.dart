@@ -8,17 +8,19 @@ class LoginProfilPage extends StatefulWidget {
     super.key,
     this.namaJemaat = 'Daniel Susanto',
     this.nomorAnggota = '0218',
+    this.pelayanan = const ['Usher', 'Multimedia'],
   });
 
   final String namaJemaat;
   final String nomorAnggota;
+  final List<String> pelayanan;
 
   @override
   State<LoginProfilPage> createState() => _LoginProfilPageState();
 }
 
 class _LoginProfilPageState extends State<LoginProfilPage> {
-  bool _remindersEnabled = true;
+  bool get _anggotaPelayanan => widget.pelayanan.isNotEmpty;
 
   String get _initials {
     final parts = widget.namaJemaat.trim().split(RegExp(r'\s+'));
@@ -41,7 +43,7 @@ class _LoginProfilPageState extends State<LoginProfilPage> {
               onPressed: () => Navigator.of(
                 context,
                 rootNavigator: true,
-              ).pushNamed('/pengaturan'),
+              ).pushNamed('/pengaturan', arguments: _anggotaPelayanan),
             ),
           ),
           _header(),
@@ -49,22 +51,27 @@ class _LoginProfilPageState extends State<LoginProfilPage> {
             judul: 'Komunitas Anda',
             chips: const ['Pemuda', 'Wilayah Tenggilis'],
           ),
-          _kartuInfo(
-            judul: 'Pelayanan yang dapat diikuti',
-            chips: const ['Usher', 'Multimedia'],
-            brand: true,
-          ),
+          if (_anggotaPelayanan)
+            _kartuInfo(
+              judul: 'Pelayanan yang dapat diikuti',
+              chips: widget.pelayanan,
+              brand: true,
+            ),
           const LabelBagian('Pengaturan'),
           GrupList(
             children: [
-              BarisList(
-                ikon: Icons.notifications_none,
-                judul: 'Pengingat jadwal',
-                subjudul: 'H-1 dan 2 jam sebelum tugas',
-                trailing: Saklar(
-                  nilai: _remindersEnabled,
-                  onChanged: (v) => setState(() => _remindersEnabled = v),
+              if (_anggotaPelayanan)
+                BarisPengingat(
+                  ikon: Icons.assignment_ind_outlined,
+                  judul: 'Pengingat tugas pelayanan',
+                  subjudul: 'H-1 pukul 19.00 dan 2 jam sebelum tugas',
+                  nilai: pengingatTugas,
                 ),
+              BarisPengingat(
+                ikon: Icons.notifications_none,
+                judul: 'Pengingat ibadah Minggu',
+                subjudul: 'Minggu pukul 05.30',
+                nilai: pengingatIbadah,
               ),
               ValueListenableBuilder<String>(
                 valueListenable: ukuranTeks,

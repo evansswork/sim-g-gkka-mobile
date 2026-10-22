@@ -11,8 +11,6 @@ class ProfilPage extends StatefulWidget {
 }
 
 class _ProfilPageState extends State<ProfilPage> {
-  bool _remindersEnabled = true;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,14 +71,11 @@ class _ProfilPageState extends State<ProfilPage> {
           const LabelBagian('Pengaturan'),
           GrupList(
             children: [
-              BarisList(
+              BarisPengingat(
                 ikon: Icons.notifications_none,
                 judul: 'Pengingat ibadah',
                 subjudul: 'Minggu pagi dan saat form evaluasi dibuka',
-                trailing: Saklar(
-                  nilai: _remindersEnabled,
-                  onChanged: (v) => setState(() => _remindersEnabled = v),
-                ),
+                nilai: pengingatIbadah,
               ),
               ValueListenableBuilder<String>(
                 valueListenable: ukuranTeks,

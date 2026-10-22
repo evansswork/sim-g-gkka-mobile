@@ -52,7 +52,10 @@ class MainApp extends StatelessWidget {
           '/beranda': (_) => const TabShell(sudahLogin: false),
           '/login-beranda': (_) => const TabShell(sudahLogin: true),
           '/masuk': (_) => const MasukPage(),
-          '/pengaturan': (_) => const PengaturanPage(),
+          '/pengaturan': (context) => PengaturanPage(
+            anggotaPelayanan:
+                ModalRoute.of(context)?.settings.arguments as bool? ?? true,
+          ),
           '/ubah-profil': (_) => const UbahProfilPage(),
         },
       ),

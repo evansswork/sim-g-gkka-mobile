@@ -3,17 +3,15 @@ import 'package:flutter/material.dart';
 import 'tema.dart';
 
 class PengaturanPage extends StatefulWidget {
-  const PengaturanPage({super.key});
+  const PengaturanPage({this.anggotaPelayanan = true, super.key});
+
+  final bool anggotaPelayanan;
 
   @override
   State<PengaturanPage> createState() => _PengaturanPageState();
 }
 
 class _PengaturanPageState extends State<PengaturanPage> {
-  bool _ministryReminder = true;
-  bool _sundayReminder = true;
-  bool _evaluationReminder = false;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,29 +22,21 @@ class _PengaturanPageState extends State<PengaturanPage> {
           GrupList(
             indent: 16,
             children: [
-              BarisList(
-                judul: 'Pengingat tugas pelayanan',
-                subjudul: 'H-1 pukul 19.00 dan 2 jam sebelum tugas',
-                trailing: Saklar(
-                  nilai: _ministryReminder,
-                  onChanged: (v) => setState(() => _ministryReminder = v),
+              if (widget.anggotaPelayanan)
+                BarisPengingat(
+                  judul: 'Pengingat tugas pelayanan',
+                  subjudul: 'H-1 pukul 19.00 dan 2 jam sebelum tugas',
+                  nilai: pengingatTugas,
                 ),
-              ),
-              BarisList(
+              BarisPengingat(
                 judul: 'Pengingat ibadah Minggu',
                 subjudul: 'Minggu pukul 05.30',
-                trailing: Saklar(
-                  nilai: _sundayReminder,
-                  onChanged: (v) => setState(() => _sundayReminder = v),
-                ),
+                nilai: pengingatIbadah,
               ),
-              BarisList(
+              BarisPengingat(
                 judul: 'Form evaluasi dibuka',
                 subjudul: 'Minggu pukul 06.00',
-                trailing: Saklar(
-                  nilai: _evaluationReminder,
-                  onChanged: (v) => setState(() => _evaluationReminder = v),
-                ),
+                nilai: pengingatEvaluasi,
               ),
             ],
           ),

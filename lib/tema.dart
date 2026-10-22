@@ -102,6 +102,11 @@ class Teks {
 
 final ukuranTeks = ValueNotifier<String>('Normal');
 
+// satu nilai dipakai profil & pengaturan supaya saklarnya selalu sama
+final pengingatTugas = ValueNotifier<bool>(true);
+final pengingatIbadah = ValueNotifier<bool>(true);
+final pengingatEvaluasi = ValueNotifier<bool>(false);
+
 const skalaUkuranTeks = {
   'Kecil': 0.9,
   'Normal': 1.0,
@@ -865,4 +870,32 @@ void pilihUkuranTeks(BuildContext context) {
       ),
     ),
   );
+}
+
+class BarisPengingat extends StatelessWidget {
+  const BarisPengingat({
+    required this.judul,
+    required this.subjudul,
+    required this.nilai,
+    this.ikon,
+    super.key,
+  });
+
+  final String judul;
+  final String subjudul;
+  final ValueNotifier<bool> nilai;
+  final IconData? ikon;
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<bool>(
+      valueListenable: nilai,
+      builder: (context, aktif, _) => BarisList(
+        ikon: ikon,
+        judul: judul,
+        subjudul: subjudul,
+        trailing: Saklar(nilai: aktif, onChanged: (v) => nilai.value = v),
+      ),
+    );
+  }
 }
