@@ -1,479 +1,283 @@
 import 'package:flutter/material.dart';
 
-import 'app_bottom_navigation.dart';
-import 'masuk.dart';
+import 'tab_shell.dart';
+import 'tema.dart';
 
-const _ink = Color(0xFF102D2F);
-const _teal = Color(0xFF006F77);
-const _page = Color(0xFFF3F7F7);
-
-class BerandaPage extends StatefulWidget {
+class BerandaPage extends StatelessWidget {
   const BerandaPage({super.key});
 
   @override
-  State<BerandaPage> createState() => _BerandaPageState();
-}
-
-class _BerandaPageState extends State<BerandaPage> {
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _page,
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(14, 12, 14, 18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      body: IsiHalaman(
+        children: [
+          JudulHalaman(
+            'Shalom',
+            subjudul: 'Jumat, 16 Oktober',
+            aksi: TombolMobile(
+              'Masuk',
+              ikon: Icons.person_outline,
+              jenis: JenisTombol.kedua,
+              tinggi: 44,
+              lebarPenuh: false,
+              onPressed: () => Navigator.of(context).pushNamed('/masuk'),
+            ),
+          ),
+          const KartuIbadahMinggu(),
+          Kartu(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Row(
                   children: [
-                    _buildHeader(),
-                    const SizedBox(height: 12),
-                    _buildServiceCard(),
-                    const SizedBox(height: 11),
-                    _buildEvaluationCard(),
-                    const SizedBox(height: 11),
-                    _buildMinistryCard(),
-                    const SizedBox(height: 17),
-                    _buildActivitiesHeader(),
-                    const SizedBox(height: 9),
-                    _buildActivityCard(
-                      day: '17',
-                      weekday: 'Sab',
-                      title: 'Ibadah Pemuda',
-                      subtitle: 'Sabtu, 18.00 • Aula gereja',
+                    Expanded(
+                      child: Text('Evaluasi ibadah', style: Teks.headline),
                     ),
-                    const SizedBox(height: 9),
-                    _buildActivityCard(
-                      day: '18',
-                      weekday: 'Min',
-                      title: 'Ibadah Raya',
-                      subtitle: 'Minggu, 07.00 • Umum 1',
-                    ),
+                    Lencana('Tanpa login'),
                   ],
                 ),
-              ),
+                const SizedBox(height: 12),
+                Text(
+                  'Jawaban anonim lewat Google Form, sekitar 2 menit. '
+                  'Form minggu ini dibuka Minggu 06.00.',
+                  style: Teks.sub.copyWith(color: Warna.teksKedua),
+                ),
+                const SizedBox(height: 12),
+                TombolMobile(
+                  'Ingatkan saya hari Minggu',
+                  ikon: Icons.notifications_none,
+                  jenis: JenisTombol.tint,
+                  onPressed: () => tampilkanPesan(
+                    context,
+                    'Pengingat ibadah Minggu telah diaktifkan.',
+                  ),
+                ),
+              ],
             ),
-            const AppBottomNavigation(currentIndex: 0),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          ),
+          Kartu(
+            warna: Warna.brandTint,
+            bergaris: false,
+            onTap: () => Navigator.of(context).pushNamed('/masuk'),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Melayani di gereja?',
+                        style: Teks.isiTebal.copyWith(color: Warna.brandKuat),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Masuk untuk melihat jadwal tugas dan riwayat Anda.',
+                        style: Teks.sub.copyWith(color: Warna.teksKedua),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                const Icon(
+                  Icons.chevron_right,
+                  size: 20,
+                  color: Warna.brandKuat,
+                ),
+              ],
+            ),
+          ),
+          JudulBagian(
+            'Kegiatan minggu ini',
+            aksi: 'Semua',
+            onAksi: () => TabShell.pindah(context, 1),
+          ),
+          const GrupList(
+            indent: 76,
             children: [
-              const Text(
-                'Shalom',
-                style: TextStyle(
-                  color: _ink,
-                  fontSize: 22,
-                  height: 1.1,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.7,
-                ),
+              BarisKegiatan(
+                hari: 'Sab',
+                tanggal: '17',
+                judul: 'Ibadah Pemuda',
+                keterangan: '18.00, Berani Berbeda',
               ),
-              const SizedBox(height: 3),
-              Text(
-                'Jumat, 16 Oktober',
-                style: TextStyle(
-                  color: _ink.withValues(alpha: 0.58),
-                  fontSize: 10,
-                ),
+              BarisKegiatan(
+                hari: 'Rab',
+                tanggal: '21',
+                judul: 'Persekutuan Doa',
+                keterangan: '19.00, Ruang Doa Lt. 2',
               ),
             ],
           ),
-        ),
-        OutlinedButton.icon(
-          onPressed: () {
-            Navigator.of(
-              context,
-            ).push(MaterialPageRoute<void>(builder: (_) => const MasukPage()));
-          },
-          icon: const Icon(Icons.person_outline, size: 16),
-          label: const Text('Masuk'),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: _ink,
-            backgroundColor: Colors.white,
-            side: const BorderSide(color: Color(0xFFD7E1E2)),
-            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
-            minimumSize: const Size(0, 34),
-            textStyle: const TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
+}
 
-  Widget _buildServiceCard() {
+class KartuIbadahMinggu extends StatelessWidget {
+  const KartuIbadahMinggu({
+    this.tanggal = 'Minggu, 18 Oktober',
+    this.tugasDi,
+    this.tugas = 'Usher',
+    super.key,
+  });
+
+  final String tanggal;
+  final int? tugasDi;
+  final String tugas;
+
+  static const _jadwal = [
+    (jam: '07.00', label: 'Umum 1'),
+    (jam: '09.30', label: 'Umum 2'),
+    (jam: '09.30', label: 'Anak (SM)'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 13),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: _ink,
-        borderRadius: BorderRadius.circular(15),
+        color: Warna.gelap,
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Minggu, 18 Oktober',
-                  style: TextStyle(
-                    color: Color(0xFFF4B544),
-                    fontSize: 9,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  tanggal,
+                  style: Teks.subTebal.copyWith(color: Warna.emas),
                 ),
               ),
               Text(
                 'Ibadah Raya',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.68),
-                  fontSize: 9,
-                ),
+                style: Teks.kecil.copyWith(color: Warna.gelapPudar),
               ),
             ],
           ),
-          const SizedBox(height: 9),
-          const FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Text(
-              'Hidup yang Berbuah',
-              style: TextStyle(
-                color: Color(0xFFF3F7F7),
-                fontSize: 21,
-                height: 1.1,
-                fontWeight: FontWeight.w800,
-                letterSpacing: -0.6,
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 14),
           Text(
-            'Yohanes 15:1-8, Pdt. Samuel Effendi',
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.6),
-              fontSize: 9,
-            ),
+            'Hidup yang Berbuah',
+            style: Teks.judulBesar.copyWith(color: Warna.gelapTeks),
           ),
-          const SizedBox(height: 10),
-          const Row(
-            children: [
-              Expanded(
-                child: _ServiceTime(time: '07.00', label: 'Umum 1'),
-              ),
-              SizedBox(width: 6),
-              Expanded(
-                child: _ServiceTime(time: '09.30', label: 'Umum 2'),
-              ),
-              SizedBox(width: 6),
-              Expanded(
-                child: _ServiceTime(time: '09.30', label: 'Anak (SM)'),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEvaluationCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(11, 10, 11, 11),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: const Color(0xFFE0E8E8)),
-        borderRadius: BorderRadius.circular(13),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Expanded(
-                child: Text(
-                  'Evaluasi ibadah',
-                  style: TextStyle(
-                    color: _ink,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE3F3F2),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: const Text(
-                  'Tanpa login',
-                  style: TextStyle(
-                    color: _teal,
-                    fontSize: 8,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 7),
+          const SizedBox(height: 14),
           Text(
-            'Jawaban anonim lewat Google Form, sekitar 2 '
-            'menit. Form minggu ini dibuka Minggu 06.00.',
-            style: TextStyle(
-              color: _ink.withValues(alpha: 0.7),
-              fontSize: 9,
-              height: 1.45,
-            ),
+            'Yohanes 15:1–8, Pdt. Samuel Effendi',
+            style: Teks.sub.copyWith(color: Warna.gelapPudar),
           ),
-          const SizedBox(height: 9),
-          SizedBox(
-            width: double.infinity,
-            height: 35,
-            child: FilledButton.icon(
-              onPressed: () =>
-                  _showMessage('Pengingat ibadah Minggu telah diaktifkan.'),
-              icon: const Icon(Icons.notifications_none, size: 15),
-              label: const Text('Ingatkan saya hari Minggu'),
-              style: FilledButton.styleFrom(
-                foregroundColor: _teal,
-                backgroundColor: const Color(0xFFE1F3F2),
-                textStyle: const TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(9),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMinistryCard() {
-    return Material(
-      color: const Color(0xFFE0F3F2),
-      borderRadius: BorderRadius.circular(13),
-      child: InkWell(
-        onTap: () => _showMessage('Masuk untuk melihat jadwal pelayanan.'),
-        borderRadius: BorderRadius.circular(13),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(11, 11, 10, 11),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Melayani di gereja?',
-                      style: TextStyle(
-                        color: _teal,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      'Masuk untuk melihat jadwal tugas dan riwayat Anda.',
-                      style: TextStyle(
-                        color: _ink.withValues(alpha: 0.72),
-                        fontSize: 9,
-                        height: 1.35,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              const Icon(Icons.chevron_right, color: _teal, size: 19),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildActivitiesHeader() {
-    return Row(
-      children: [
-        const Expanded(
-          child: Text(
-            'Kegiatan minggu ini',
-            style: TextStyle(
-              color: _ink,
-              fontSize: 12,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ),
-        TextButton(
-          onPressed: () => _showMessage('Semua kegiatan minggu ini'),
-          style: TextButton.styleFrom(
-            foregroundColor: _teal,
-            padding: EdgeInsets.zero,
-            minimumSize: const Size(0, 24),
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            textStyle: const TextStyle(
-              fontSize: 9,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          child: const Text('Semua'),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActivityCard({
-    required String day,
-    required String weekday,
-    required String title,
-    required String subtitle,
-  }) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: const Color(0xFFE0E8E8)),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 33,
-            padding: const EdgeInsets.symmetric(vertical: 5),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF0F5F5),
-              borderRadius: BorderRadius.circular(7),
-            ),
-            child: Column(
+          const SizedBox(height: 14),
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  weekday,
-                  style: TextStyle(
-                    color: _ink.withValues(alpha: 0.65),
-                    fontSize: 8,
+                for (var i = 0; i < _jadwal.length; i++) ...[
+                  if (i > 0) const SizedBox(width: 8),
+                  Expanded(
+                    child: _JamIbadah(
+                      jam: _jadwal[i].jam,
+                      label: _jadwal[i].label,
+                      tugas: i == tugasDi ? 'Anda: $tugas' : null,
+                    ),
                   ),
-                ),
-                Text(
-                  day,
-                  style: const TextStyle(
-                    color: _ink,
-                    fontSize: 13,
-                    height: 1.1,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
+                ],
               ],
             ),
           ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: _ink,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    color: _ink.withValues(alpha: 0.62),
-                    fontSize: 8,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Icon(Icons.chevron_right, color: Color(0xFF829596), size: 18),
         ],
       ),
     );
-  }
-
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(message),
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 2),
-        ),
-      );
   }
 }
 
-class _ServiceTime extends StatelessWidget {
-  const _ServiceTime({required this.time, required this.label});
+class _JamIbadah extends StatelessWidget {
+  const _JamIbadah({required this.jam, required this.label, this.tugas});
 
-  final String time;
+  final String jam;
   final String label;
+  final String? tugas;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A4141),
-        borderRadius: BorderRadius.circular(9),
+        color: Warna.gelapAktif,
+        borderRadius: BorderRadius.circular(12),
+        border: tugas == null ? null : Border.all(color: Warna.emas, width: 2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            time,
-            style: const TextStyle(
-              color: Color(0xFFF2F7F6),
-              fontSize: 11,
-              height: 1.1,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          Text(jam, style: Teks.headline.copyWith(color: Warna.gelapTeks)),
           const SizedBox(height: 2),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Text(
-              label,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.58),
-                fontSize: 8,
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Teks.kecil.copyWith(color: Warna.gelapPudar),
+          ),
+          if (tugas != null) ...[
+            const SizedBox(height: 2),
+            Text(tugas!, style: Teks.kecil.copyWith(color: Warna.emas)),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class BarisKegiatan extends StatelessWidget {
+  const BarisKegiatan({
+    required this.hari,
+    required this.tanggal,
+    required this.judul,
+    required this.keterangan,
+    this.trailing,
+    this.aktif = false,
+    this.onTap,
+    super.key,
+  });
+
+  final String hari;
+  final String tanggal;
+  final String judul;
+  final String keterangan;
+  final Widget? trailing;
+  final bool aktif;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            KotakTanggal(hari: hari, tanggal: tanggal, aktif: aktif),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(judul, style: Teks.isiTebal),
+                  const SizedBox(height: 2),
+                  Text(keterangan, style: Teks.sub),
+                ],
               ),
             ),
-          ),
-        ],
+            if (trailing != null) ...[
+              const SizedBox(width: 8),
+              // selebar isinya, maksimal 150 supaya teks kiri tetap muat
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 150),
+                child: trailing!,
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }

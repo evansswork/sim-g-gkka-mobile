@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 
-const _ink = Color(0xFF102D2F);
-const _teal = Color(0xFF008080);
-const _muted = Color(0xFF607577);
-const _page = Color(0xFFF3F7F7);
+import 'features/auth/auth_service.dart';
+import 'tema.dart';
 
 class MasukPage extends StatefulWidget {
   const MasukPage({super.key});
@@ -17,6 +15,7 @@ class _MasukPageState extends State<MasukPage> {
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _sedangLogin = false;
 
   @override
   void dispose() {
@@ -28,271 +27,152 @@ class _MasukPageState extends State<MasukPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Warna.permukaan,
       body: SafeArea(
         bottom: false,
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(9, 4, 9, 20),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: TombolKembali(),
+                ),
+                const SizedBox(height: 20),
+                const Text('Masuk', style: Teks.judulBesar),
+                const SizedBox(height: 8),
+                Text(
+                  'Gunakan no. HP yang terdaftar di sekretariat gereja.',
+                  style: Teks.isi.copyWith(color: Warna.teksKedua),
+                ),
+                const SizedBox(height: 20),
+                IsianForm(
+                  label: 'No. HP',
+                  child: TextFormField(
+                    controller: _phoneController,
+                    keyboardType: TextInputType.phone,
+                    textInputAction: TextInputAction.next,
+                    style: Teks.isi,
+                    decoration: gayaInput(
+                      hint: '08xx-xxxx-xxxx',
+                      ikon: Icons.chat_bubble_outline,
+                    ),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'No. HP wajib diisi.';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                const SizedBox(height: 20),
+                IsianForm(
+                  label: 'Kata sandi',
+                  child: TextFormField(
+                    controller: _passwordController,
+                    obscureText: _obscurePassword,
+                    textInputAction: TextInputAction.done,
+                    onFieldSubmitted: (_) => _submit(),
+                    style: Teks.isi,
+                    decoration: gayaInput(
+                      hint: 'Masukkan kata sandi',
+                      ikon: Icons.lock_outline,
+                      suffix: IconButton(
+                        tooltip: _obscurePassword
+                            ? 'Tampilkan kata sandi'
+                            : 'Sembunyikan kata sandi',
+                        onPressed: () => setState(
+                          () => _obscurePassword = !_obscurePassword,
+                        ),
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
+                          size: 20,
+                          color: Warna.teksKedua,
+                        ),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Kata sandi wajib diisi.';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TautanTeks(
+                    'Lupa kata sandi?',
+                    onTap: () => tampilkanPesan(
+                      context,
+                      'Hubungi sekretariat gereja untuk bantuan '
+                      'mengatur ulang kata sandi.',
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Warna.halus,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        tooltip: 'Kembali',
-                        icon: const Icon(
-                          Icons.arrow_back,
-                          color: _ink,
-                          size: 20,
-                        ),
-                        padding: EdgeInsets.zero,
-                        alignment: Alignment.centerLeft,
-                        constraints: const BoxConstraints(
-                          minWidth: 36,
-                          minHeight: 36,
-                        ),
+                      Icon(
+                        Icons.info_outline,
+                        size: 20,
+                        color: Warna.teksPudar,
                       ),
-                      const SizedBox(height: 10),
-                      const Text(
-                        'Masuk',
-                        style: TextStyle(
-                          color: _ink,
-                          fontSize: 19,
-                          height: 1.15,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -0.4,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      const Text(
-                        'Gunakan no. HP yang terdaftar di sekretariat gereja.',
-                        style: TextStyle(
-                          color: _muted,
-                          fontSize: 9,
-                          height: 1.45,
-                        ),
-                      ),
-                      const SizedBox(height: 11),
-                      const Text(
-                        'No. HP',
-                        style: TextStyle(
-                          color: _ink,
-                          fontSize: 8,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      TextFormField(
-                        controller: _phoneController,
-                        keyboardType: TextInputType.phone,
-                        textInputAction: TextInputAction.next,
-                        style: const TextStyle(color: _ink, fontSize: 10),
-                        decoration: _inputDecoration(
-                          hintText: '08xx-xxxx-xxxx',
-                          prefixIcon: Icons.chat_bubble_outline,
-                        ),
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'No. HP wajib diisi.';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 11),
-                      const Text(
-                        'Kata sandi',
-                        style: TextStyle(
-                          color: _ink,
-                          fontSize: 8,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      TextFormField(
-                        controller: _passwordController,
-                        obscureText: _obscurePassword,
-                        textInputAction: TextInputAction.done,
-                        onFieldSubmitted: (_) => _submit(),
-                        style: const TextStyle(color: _ink, fontSize: 10),
-                        decoration: _inputDecoration(
-                          hintText: 'Masukkan kata sandi',
-                          prefixIcon: Icons.lock_outline,
-                          suffixIcon: IconButton(
-                            tooltip: _obscurePassword
-                                ? 'Tampilkan kata sandi'
-                                : 'Sembunyikan kata sandi',
-                            onPressed: () {
-                              setState(() {
-                                _obscurePassword = !_obscurePassword;
-                              });
-                            },
-                            icon: Icon(
-                              _obscurePassword
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
-                              color: _muted,
-                              size: 16,
-                            ),
-                          ),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Kata sandi wajib diisi.';
-                          }
-                          return null;
-                        },
-                      ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () => _showMessage(
-                            'Hubungi sekretariat gereja untuk bantuan '
-                            'mengatur ulang kata sandi.',
-                          ),
-                          style: TextButton.styleFrom(
-                            foregroundColor: _teal,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 2,
-                              vertical: 7,
-                            ),
-                            minimumSize: const Size(0, 28),
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            textStyle: const TextStyle(
-                              fontSize: 8,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          child: const Text('Lupa kata sandi?'),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 9,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _page,
-                          borderRadius: BorderRadius.circular(11),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Padding(
-                              padding: EdgeInsets.only(top: 1),
-                              child: Icon(
-                                Icons.info_outline,
-                                color: _muted,
-                                size: 12,
-                              ),
-                            ),
-                            const SizedBox(width: 7),
-                            Expanded(
-                              child: Text(
-                                'Akun dibuat oleh sekretariat. Tanpa akun Anda '
-                                'tetap bisa melihat jadwal dan mengisi evaluasi.',
-                                style: TextStyle(
-                                  color: _muted.withValues(alpha: 0.82),
-                                  fontSize: 8,
-                                  height: 1.45,
-                                ),
-                              ),
-                            ),
-                          ],
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Akun dibuat oleh sekretariat. Tanpa akun Anda '
+                          'tetap bisa melihat jadwal dan mengisi evaluasi.',
+                          style: Teks.sub,
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
+              ],
             ),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(9, 7, 9, 9),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                border: Border(top: BorderSide(color: Color(0xFFE8EEEE))),
-              ),
-              child: SafeArea(
-                top: false,
-                child: SizedBox(
-                  height: 34,
-                  child: FilledButton(
-                    onPressed: _submit,
-                    style: FilledButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: _teal,
-                      textStyle: const TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: const Text('Masuk'),
-                  ),
-                ),
-              ),
-            ),
-          ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: BilahBawah(
+        child: TombolMobile(
+          _sedangLogin ? 'Memproses...' : 'Masuk',
+          onPressed: _sedangLogin ? null : _submit,
         ),
       ),
     );
   }
 
-  InputDecoration _inputDecoration({
-    required String hintText,
-    required IconData prefixIcon,
-    Widget? suffixIcon,
-  }) {
-    const border = OutlineInputBorder(
-      borderRadius: BorderRadius.all(Radius.circular(9)),
-      borderSide: BorderSide(color: Color(0xFFD8E1E2)),
-    );
-
-    return InputDecoration(
-      hintText: hintText,
-      hintStyle: const TextStyle(color: Color(0xFF9AA9AA), fontSize: 10),
-      prefixIcon: Icon(prefixIcon, color: _muted, size: 14),
-      suffixIcon: suffixIcon,
-      isDense: true,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      border: border,
-      enabledBorder: border,
-      focusedBorder: border.copyWith(
-        borderSide: const BorderSide(color: _teal, width: 1.2),
-      ),
-      errorBorder: border.copyWith(
-        borderSide: const BorderSide(color: Color(0xFFB3261E)),
-      ),
-      focusedErrorBorder: border.copyWith(
-        borderSide: const BorderSide(color: Color(0xFFB3261E), width: 1.2),
-      ),
-      errorStyle: const TextStyle(fontSize: 8),
-    );
-  }
-
-  void _submit() {
+  Future<void> _submit() async {
+    if (_sedangLogin) return;
     if (!_formKey.currentState!.validate()) return;
 
-    _showMessage('Login belum terhubung ke layanan akun gereja.');
-  }
+    // buang spasi & strip: "0812-3456 7890" -> "081234567890"
+    final noHp = _phoneController.text.replaceAll(RegExp(r'[\s-]'), '');
+    final password = _passwordController.text;
 
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(message),
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 3),
-        ),
-      );
+    setState(() => _sedangLogin = true);
+    try {
+      await AuthService.login(noHp, password);
+      if (!mounted) return;
+      Navigator.of(context)
+          .pushNamedAndRemoveUntil('/login-beranda', (_) => false);
+    } catch (pesan) {
+      if (mounted) tampilkanPesan(context, '$pesan');
+    }
+    if (mounted) setState(() => _sedangLogin = false);
   }
 }

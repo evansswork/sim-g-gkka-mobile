@@ -1,60 +1,61 @@
 import 'package:flutter/material.dart';
 
-import 'beranda.dart';
-import 'jadwal.dart';
-import 'login_beranda.dart';
-import 'login_jadwal.dart';
-import 'login_profil.dart';
-import 'login_riwayat.dart';
+import 'core/api.dart';
+import 'features/auth/auth_service.dart';
 import 'masuk.dart';
 import 'pengaturan.dart';
-import 'profil.dart';
-import 'riwayat.dart';
+import 'tab_shell.dart';
+import 'tema.dart';
 import 'ubah_profil.dart';
-import 'usher_absen.dart';
-import 'usher_main.dart';
 
-void main() {
-  runApp(const MainApp());
+final navigatorKey = GlobalKey<NavigatorState>();
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  Api.saatSesiHabis = () {
+    AuthService.userLogin = null;
+    navigatorKey.currentState?.pushNamedAndRemoveUntil(
+      '/beranda',
+      (_) => false,
+    );
+  };
+
+  await AuthService.cekSesi();
+  runApp(MainApp(sudahLogin: AuthService.userLogin != null));
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  // default true supaya widget test langsung membuka beranda jemaat
+  const MainApp({super.key, this.sudahLogin = true});
+
+  final bool sudahLogin;
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF006F77)),
-        useMaterial3: true,
+    return ValueListenableBuilder<String>(
+      valueListenable: ukuranTeks,
+      builder: (context, ukuran, _) => MaterialApp(
+        navigatorKey: navigatorKey,
+        debugShowCheckedModeBanner: false,
+        theme: temaAplikasi(),
+        builder: (context, child) {
+          final mq = MediaQuery.of(context);
+          final skala = mq.textScaler.scale(1) * skalaUkuranTeks[ukuran]!;
+          return MediaQuery(
+            data: mq.copyWith(textScaler: TextScaler.linear(skala)),
+            child: child!,
+          );
+        },
+        home: TabShell(sudahLogin: sudahLogin),
+        routes: {
+          '/beranda': (_) => const TabShell(sudahLogin: false),
+          '/login-beranda': (_) => const TabShell(sudahLogin: true),
+          '/masuk': (_) => const MasukPage(),
+          '/pengaturan': (_) => const PengaturanPage(),
+          '/ubah-profil': (_) => const UbahProfilPage(),
+        },
       ),
-      builder: (context, child) {
-        final mediaQuery = MediaQuery.of(context);
-        final systemScale = mediaQuery.textScaler.scale(1);
-        return MediaQuery(
-          data: mediaQuery.copyWith(
-            textScaler: TextScaler.linear(systemScale * 1.4),
-          ),
-          child: child!,
-        );
-      },
-      home: const LoginBerandaPage(),
-      routes: {
-        '/beranda': (_) => const BerandaPage(),
-        '/jadwal': (_) => const JadwalPage(),
-        '/login-jadwal': (_) => const LoginJadwalPage(),
-        '/login-riwayat': (_) => const LoginRiwayatPage(),
-        '/login-profil': (_) => const LoginProfilPage(),
-        '/login-beranda': (_) => const LoginBerandaPage(),
-        '/riwayat': (_) => const RiwayatPage(),
-        '/profil': (_) => const ProfilPage(),
-        '/masuk': (_) => const MasukPage(),
-        '/pengaturan': (_) => const PengaturanPage(),
-        '/ubah-profil': (_) => const UbahProfilPage(),
-        '/usher-main': (_) => const UsherMainPage(),
-        '/usher-absen': (_) => const UsherAbsenPage(),
-      },
     );
   }
 }

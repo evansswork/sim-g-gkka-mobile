@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'app_bottom_navigation.dart';
-
-const _ink = Color(0xFF102D2F);
-const _muted = Color(0xFF708384);
-const _page = Color(0xFFF3F7F7);
+import 'tema.dart';
 
 class RiwayatPage extends StatelessWidget {
   const RiwayatPage({super.key});
@@ -12,137 +8,151 @@ class RiwayatPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _page,
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(9, 10, 9, 10),
-              child: Text(
-                'Riwayat',
-                style: TextStyle(
-                  color: _ink,
-                  fontSize: 17,
-                  height: 1.1,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
+      body: IsiHalaman(
+        children: [
+          const JudulHalaman('Riwayat'),
+          const KartuHadirMinggu(
+            minggu: [
+              (tanggal: '4 Okt', status: StatusHadir.kosong),
+              (tanggal: '11 Okt', status: StatusHadir.kosong),
+              (tanggal: '18 Okt', status: StatusHadir.kosong),
+              (tanggal: '25 Okt', status: StatusHadir.kosong),
+            ],
+            keterangan:
+                'Kehadiran Anda di setiap ibadah Minggu tercatat di sini '
+                'setelah masuk.',
+          ),
+          KotakKosong(
+            ikon: Icons.history,
+            judul: 'Riwayat masih kosong',
+            keterangan: 'Masuk untuk melihat ibadah dan pelayanan yang pernah Anda ikuti.',
+            aksi: TombolMobile(
+              'Masuk',
+              onPressed: () => Navigator.of(context).pushNamed('/masuk'),
             ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(9, 0, 9, 16),
-                child: Column(
-                  children: [
-                    _buildAttendanceCard(),
-                    const SizedBox(height: 9),
-                    _buildEmptyState(),
-                  ],
-                ),
-              ),
-            ),
-            const AppBottomNavigation(currentIndex: 2),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
+}
 
-  Widget _buildAttendanceCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(9, 10, 9, 9),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: const Color(0xFFE0E8E8)),
-        borderRadius: BorderRadius.circular(11),
-      ),
+enum StatusHadir { kosong, hadir, usher, mingguIni, nanti }
+
+class KartuHadirMinggu extends StatelessWidget {
+  const KartuHadirMinggu({
+    required this.minggu,
+    required this.keterangan,
+    super.key,
+  });
+
+  final List<({String tanggal, StatusHadir status})> minggu;
+  final String keterangan;
+
+  @override
+  Widget build(BuildContext context) {
+    return Kartu(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Ibadah Minggu, Oktober',
-            style: TextStyle(
-              color: _ink,
-              fontSize: 8,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 9),
+          const Text('Ibadah Minggu, Oktober', style: Teks.headline),
+          const SizedBox(height: 14),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              for (final date in ['4 Okt', '11 Okt', '18 Okt', '25 Okt'])
-                Expanded(
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 19,
-                        height: 19,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: const Color(0xFFE1E8E8)),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        date,
-                        style: const TextStyle(color: _muted, fontSize: 7),
-                      ),
-                    ],
-                  ),
-                ),
+              for (var i = 0; i < minggu.length; i++) ...[
+                if (i > 0) const SizedBox(width: 8),
+                Expanded(child: _item(minggu[i])),
+              ],
             ],
           ),
-          const SizedBox(height: 9),
-          const Text(
-            'Kehadiran Anda di setiap ibadah Minggu tercatat di sini setelah masuk.',
-            style: TextStyle(color: _muted, fontSize: 7, height: 1.35),
+          const SizedBox(height: 14),
+          Text(keterangan, style: Teks.sub.copyWith(color: Warna.teksKedua)),
+        ],
+      ),
+    );
+  }
+
+  Widget _item(({String tanggal, StatusHadir status}) m) {
+    final (label, warnaLabel) = switch (m.status) {
+      StatusHadir.hadir => ('Hadir', Warna.teksPudar),
+      StatusHadir.usher => ('Usher', Warna.brandKuat),
+      StatusHadir.mingguIni => ('Minggu ini', Warna.teksPudar),
+      _ => ('—', Warna.teksPudar),
+    };
+    final pudar =
+        m.status == StatusHadir.kosong || m.status == StatusHadir.nanti;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Column(
+        children: [
+          _lingkaran(m.status),
+          const SizedBox(height: 8),
+          Text(
+            m.tanggal,
+            style: Teks.subTebal.copyWith(
+              color: pudar ? Warna.teksPudar : Warna.teksUtama,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Teks.kecil.copyWith(color: warnaLabel),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _lingkaran(StatusHadir s) {
+    return switch (s) {
+      StatusHadir.hadir => _bulat(
+        Warna.brandTint,
+        const Icon(Icons.check, size: 16, color: Warna.brandKuat),
+      ),
+      StatusHadir.usher => _bulat(
+        Warna.brand,
+        const Icon(Icons.how_to_reg_outlined, size: 16, color: Colors.white),
+      ),
+      StatusHadir.mingguIni => _bulat(null, null, garis: Warna.brand),
+      StatusHadir.nanti => _bulat(null, null, garis: Warna.garisKuat),
+      StatusHadir.kosong => CustomPaint(
+        painter: _LingkaranPutus(),
+        child: const SizedBox(width: 32, height: 32),
+      ),
+    };
+  }
+
+  Widget _bulat(Color? isi, Widget? ikon, {Color? garis}) {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(10, 12, 10, 10),
+      width: 32,
+      height: 32,
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: const Color(0xFFD7E1E2)),
-        borderRadius: BorderRadius.circular(12),
+        color: isi,
+        shape: BoxShape.circle,
+        border: garis == null ? null : Border.all(color: garis),
       ),
-      child: Column(
-        children: [
-          Container(
-            width: 26,
-            height: 26,
-            decoration: const BoxDecoration(
-              color: _page,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.history, color: _muted, size: 14),
-          ),
-          const SizedBox(height: 6),
-          const Text(
-            'Riwayat masih kosong',
-            style: TextStyle(
-              color: _ink,
-              fontSize: 9,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            'Masuk untuk melihat ibadah dan pelayanan yang pernah Anda ikuti.',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: _muted, fontSize: 7, height: 1.4),
-          ),
-          const SizedBox(height: 9),
-          const LoginButton(),
-        ],
-      ),
+      child: ikon,
     );
   }
+}
+
+class _LingkaranPutus extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cat = Paint()
+      ..color = Warna.garisKuat
+      ..style = PaintingStyle.stroke;
+    final jalur = Path()..addOval((Offset.zero & size).deflate(0.5));
+    for (final m in jalur.computeMetrics()) {
+      for (var d = 0.0; d < m.length; d += 6) {
+        canvas.drawPath(m.extractPath(d, d + 3), cat);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
