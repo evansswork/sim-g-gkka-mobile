@@ -6,10 +6,21 @@ import 'config/env.dart';
 class Api {
   static const penyimpanan = FlutterSecureStorage();
 
-  static final dio = Dio(BaseOptions(baseUrl: Env.apiBaseUrl))
-    ..interceptors.add(
-      InterceptorsWrapper(onRequest: _pasangToken, onError: _cobaRefreshToken),
-    );
+  // timeout supaya app tidak menunggu terus (layar hitam) kalau server tidak bisa dihubungi
+  static final dio =
+      Dio(
+          BaseOptions(
+            baseUrl: Env.apiBaseUrl,
+            connectTimeout: const Duration(seconds: 10),
+            receiveTimeout: const Duration(seconds: 20),
+          ),
+        )
+        ..interceptors.add(
+          InterceptorsWrapper(
+            onRequest: _pasangToken,
+            onError: _cobaRefreshToken,
+          ),
+        );
 
   static void Function()? saatSesiHabis;
 

@@ -14,7 +14,8 @@ import 'riwayat.dart';
 import 'usher_main.dart';
 
 // kerangka 5 tab. IndexedStack menyimpan semua tab, jadi pindah tab
-// tidak membuat ulang halaman (scroll, filter, dan data tetap)
+// tidak membuat ulang halaman (scroll, filter, dan data tetap).
+// Tab baru dibangun saat pertama kali dibuka, supaya app lebih ringan saat start.
 class TabShell extends StatefulWidget {
   const TabShell({required this.sudahLogin, this.tabAwal = 0, super.key});
 
@@ -30,6 +31,8 @@ class TabShell extends StatefulWidget {
 
 class _TabShellState extends State<TabShell> {
   late int _tab = widget.tabAwal;
+  // tab yang sudah pernah dibuka; yang belum diganti kotak kosong
+  late final Set<int> _sudahDibuka = {widget.tabAwal};
   // navigator khusus tab beranda jemaat, supaya mode usher tetap punya tab bar
   final _navBeranda = GlobalKey<NavigatorState>();
 
@@ -47,7 +50,10 @@ class _TabShellState extends State<TabShell> {
     if (tab == 0 && _tab == 0) {
       _navBeranda.currentState?.popUntil((r) => r.isFirst);
     }
-    setState(() => _tab = tab);
+    setState(() {
+      _tab = tab;
+      _sudahDibuka.add(tab);
+    });
   }
 
   Widget _tabBeranda(Widget beranda) {
@@ -92,6 +98,7 @@ class _TabShellState extends State<TabShell> {
           : LoginProfilPage(
               namaJemaat: user.nama,
               nomorAnggota: user.kodeJemaat,
+              pelayanan: user.keahlian,
             ),
     ];
   }
@@ -99,7 +106,13 @@ class _TabShellState extends State<TabShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(index: _tab, children: _halaman),
+      body: IndexedStack(
+        index: _tab,
+        children: [
+          for (final (i, halaman) in _halaman.indexed)
+            _sudahDibuka.contains(i) ? halaman : const SizedBox.shrink(),
+        ],
+      ),
       bottomNavigationBar: AppBottomNavigation(
         currentIndex: _tab,
         onTap: _pindah,

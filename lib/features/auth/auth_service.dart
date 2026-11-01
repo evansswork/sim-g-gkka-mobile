@@ -8,12 +8,15 @@ class User {
     required this.kodeJemaat,
     required this.nama,
     required this.role,
+    this.keahlian = const [],
   });
 
   final int id;
   final String kodeJemaat;
   final String nama;
   final String role;
+  // nama keahlian yg sudah diverifikasi sekretariat, mis. Usher, Multimedia
+  final List<String> keahlian;
 
   String get namaDepan => nama.split(' ').first;
 
@@ -23,6 +26,9 @@ class User {
       kodeJemaat: json['kode_jemaat'],
       nama: json['nama'],
       role: json['role'],
+      keahlian: [
+        for (final k in json['keahlian'] as List? ?? []) k['nama'] as String,
+      ],
     );
   }
 }
