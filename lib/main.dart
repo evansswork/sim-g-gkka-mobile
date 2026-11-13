@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 import 'core/api.dart';
+import 'daftar.dart';
 import 'features/auth/auth_service.dart';
 import 'masuk.dart';
 import 'pengaturan.dart';
+import 'splash.dart';
 import 'tab_shell.dart';
 import 'tema.dart';
 import 'ubah_profil.dart';
@@ -21,15 +23,16 @@ Future<void> main() async {
     );
   };
 
-  await AuthService.cekSesi();
-  runApp(MainApp(sudahLogin: AuthService.userLogin != null));
+  // cek sesi dijalankan di dalam splash supaya animasi langsung tampil
+  runApp(const MainApp(denganSplash: true));
 }
 
 class MainApp extends StatelessWidget {
   // default true supaya widget test langsung membuka beranda jemaat
-  const MainApp({super.key, this.sudahLogin = true});
+  const MainApp({super.key, this.sudahLogin = true, this.denganSplash = false});
 
   final bool sudahLogin;
+  final bool denganSplash;
 
   @override
   Widget build(BuildContext context) {
@@ -47,11 +50,14 @@ class MainApp extends StatelessWidget {
             child: child!,
           );
         },
-        home: TabShell(sudahLogin: sudahLogin),
+        home: denganSplash
+            ? const SplashPage()
+            : TabShell(sudahLogin: sudahLogin),
         routes: {
           '/beranda': (_) => const TabShell(sudahLogin: false),
           '/login-beranda': (_) => const TabShell(sudahLogin: true),
           '/masuk': (_) => const MasukPage(),
+          '/daftar': (_) => const DaftarPage(),
           '/pengaturan': (context) => PengaturanPage(
             anggotaPelayanan:
                 ModalRoute.of(context)?.settings.arguments as bool? ?? true,
