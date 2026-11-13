@@ -97,7 +97,9 @@ class _TabShellState extends State<TabShell> {
           ? const LoginProfilPage()
           : LoginProfilPage(
               namaJemaat: user.nama,
-              nomorAnggota: user.kodeJemaat,
+              nomorAnggota:
+                  user.kodeJemaat ??
+                  '-', // belum terverifikasi = belum punya kode
               pelayanan: user.keahlian,
             ),
     ];

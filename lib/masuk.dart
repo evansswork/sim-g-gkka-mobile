@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'features/auth/auth_service.dart';
+import 'isian_no_hp.dart';
 import 'tema.dart';
 
 class MasukPage extends StatefulWidget {
@@ -12,14 +13,18 @@ class MasukPage extends StatefulWidget {
 
 class _MasukPageState extends State<MasukPage> {
   final _formKey = GlobalKey<FormState>();
-  final _identifierController = TextEditingController();
+  final _noHpController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _pakaiEmail = false; // tab: false = No. HP, true = Email
+  String _kodeNegara = '+62';
   bool _obscurePassword = true;
   bool _sedangLogin = false;
 
   @override
   void dispose() {
-    _identifierController.dispose();
+    _noHpController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -45,30 +50,47 @@ class _MasukPageState extends State<MasukPage> {
                 const Text('Masuk', style: Teks.judulBesar),
                 const SizedBox(height: 8),
                 Text(
-                  'Gunakan no. HP atau email yang terdaftar di sekretariat gereja.',
+                  'Masuk dengan no. HP atau email yang Anda pakai saat mendaftar.',
                   style: Teks.isi.copyWith(color: Warna.teksKedua),
                 ),
-                const SizedBox(height: 20),
-                IsianForm(
-                  label: 'No. HP atau email',
-                  child: TextFormField(
-                    controller: _identifierController,
-                    keyboardType: TextInputType.emailAddress,
-                    autocorrect: false,
-                    textInputAction: TextInputAction.next,
-                    style: Teks.isi,
-                    decoration: gayaInput(
-                      hint: '08xx-xxxx-xxxx atau nama@email.com',
-                      ikon: Icons.person_outline,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'No. HP atau email wajib diisi.';
-                      }
-                      return null;
-                    },
-                  ),
+                const SizedBox(height: 12),
+                TabGaris(
+                  label: const ['No. HP', 'Email'],
+                  aktif: _pakaiEmail ? 1 : 0,
+                  onTap: (i) => setState(() => _pakaiEmail = i == 1),
                 ),
+                const SizedBox(height: 20),
+                if (_pakaiEmail)
+                  IsianForm(
+                    label: 'Email',
+                    child: TextFormField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      autocorrect: false,
+                      textInputAction: TextInputAction.next,
+                      style: Teks.isi,
+                      decoration: gayaInput(
+                        hint: 'nama@email.com',
+                        ikon: Icons.mail_outline,
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Email wajib diisi.';
+                        }
+                        return null;
+                      },
+                    ),
+                  )
+                else
+                  IsianForm(
+                    label: 'No. HP',
+                    child: IsianNoHp(
+                      kodeNegara: _kodeNegara,
+                      onKodeNegara: (kode) =>
+                          setState(() => _kodeNegara = kode),
+                      controller: _noHpController,
+                    ),
+                  ),
                 const SizedBox(height: 20),
                 IsianForm(
                   label: 'Kata sandi',
@@ -117,31 +139,25 @@ class _MasukPageState extends State<MasukPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Warna.halus,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.info_outline,
-                        size: 20,
-                        color: Warna.teksPudar,
-                      ),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'Akun dibuat oleh sekretariat. Tanpa akun Anda '
-                          'tetap bisa melihat jadwal dan mengisi evaluasi.',
-                          style: Teks.sub,
-                        ),
-                      ),
-                    ],
-                  ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Belum punya akun? ',
+                      style: Teks.isi.copyWith(color: Warna.teksKedua),
+                    ),
+                    TautanTeks(
+                      'Daftar',
+                      onTap: () => Navigator.of(context).pushNamed('/daftar'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Tanpa akun Anda tetap bisa melihat jadwal dan mengisi evaluasi.',
+                  textAlign: TextAlign.center,
+                  style: Teks.sub.copyWith(color: Warna.teksPudar),
                 ),
               ],
             ),
@@ -161,11 +177,10 @@ class _MasukPageState extends State<MasukPage> {
     if (_sedangLogin) return;
     if (!_formKey.currentState!.validate()) return;
 
-    // backend mencocokkan teks persis: no. HP dibuang spasi & strip-nya
-    // ("0812-3456 7890" -> "081234567890"), email/kode jemaat cukup di-trim
-    final isian = _identifierController.text.trim();
-    final noHp = RegExp(r'^\+?[\d\s-]+$').hasMatch(isian);
-    final identifier = noHp ? isian.replaceAll(RegExp(r'[\s-]'), '') : isian;
+    // no. HP dikirim lengkap dengan kode negara ("+62" + "812..."), backend yang merapikan
+    final identifier = _pakaiEmail
+        ? _emailController.text.trim()
+        : gabungNoHp(_kodeNegara, _noHpController.text);
     final password = _passwordController.text;
 
     setState(() => _sedangLogin = true);

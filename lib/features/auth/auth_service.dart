@@ -8,13 +8,17 @@ class User {
     required this.kodeJemaat,
     required this.nama,
     required this.role,
+    required this.statusVerifikasi,
     this.keahlian = const [],
   });
 
   final int id;
-  final String kodeJemaat;
+  // null kalau belum diverifikasi sekretariat (baru daftar lewat app)
+  final String? kodeJemaat;
   final String nama;
   final String role;
+  // BELUM_TERVERIFIKASI / MENUNGGU_VERIFIKASI / TERVERIFIKASI
+  final String statusVerifikasi;
   // nama keahlian yg sudah diverifikasi sekretariat, mis. Usher, Multimedia
   final List<String> keahlian;
 
@@ -26,6 +30,7 @@ class User {
       kodeJemaat: json['kode_jemaat'],
       nama: json['nama'],
       role: json['role'],
+      statusVerifikasi: json['status_verifikasi'] ?? 'BELUM_TERVERIFIKASI',
       keahlian: [
         for (final k in json['keahlian'] as List? ?? []) k['nama'] as String,
       ],
@@ -43,12 +48,60 @@ class AuthService {
         '/auth/login',
         data: {'identifier': identifier, 'password': password},
       );
-      final data = res.data['data'];
-      await Api.simpanToken(data['access_token'], data['refresh_token']);
-      userLogin = User.dariJson(data['user']);
+      await _simpanSesi(res.data['data']);
     } on DioException catch (e) {
       throw Api.pesanError(e);
     }
+  }
+
+  // signup: akun langsung jadi dan langsung masuk (status belum terverifikasi).
+  // email atau noHp boleh kosong salah satu. tanggalLahir format "2000-05-17".
+  static Future<void> daftar({
+    required String nama,
+    required String email,
+    required String noHp,
+    required String password,
+    required String jenisKelamin,
+    required String tanggalLahir,
+    required String statusGereja,
+  }) async {
+    try {
+      final res = await Api.dio.post(
+        '/auth/signup',
+        data: {
+          'nama': nama,
+          'email': email,
+          'no_telepon': noHp,
+          'password': password,
+          'jenis_kelamin': jenisKelamin,
+          'tanggal_lahir': tanggalLahir,
+          'status_gereja': statusGereja,
+          'persetujuan_data': true,
+        },
+      );
+      await _simpanSesi(res.data['data']);
+    } on DioException catch (e) {
+      throw _pesanErrorIsian(e);
+    }
+  }
+
+  // response login dan signup bentuknya sama: token + data user
+  static Future<void> _simpanSesi(Map<String, dynamic> data) async {
+    await Api.simpanToken(data['access_token'], data['refresh_token']);
+    userLogin = User.dariJson(data['user']);
+  }
+
+  // error 409/422 dari signup punya pesan per field, tampilkan yang pertama supaya jelas apa yang salah
+  static String _pesanErrorIsian(DioException e) {
+    final body = e.response?.data;
+    if (body is Map &&
+        body['errors'] is Map &&
+        (body['errors'] as Map).isNotEmpty) {
+      final errors = body['errors'] as Map;
+      final field = errors.keys.first.toString().replaceAll('_', ' ');
+      return '${body['message'] ?? 'Data tidak valid'}: $field ${errors.values.first}';
+    }
+    return Api.pesanError(e);
   }
 
   static Future<void> cekSesi() async {
