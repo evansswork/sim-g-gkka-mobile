@@ -54,7 +54,7 @@ class _PengaturanPageState extends State<PengaturanPage> {
                 ikon: Icons.lock_outline,
                 judul: 'Ganti kata sandi',
                 onTap: () =>
-                    tampilkanPesan(context, 'Fitur ini akan segera tersedia.'),
+                    Navigator.of(context).pushNamed('/ganti-kata-sandi'),
               ),
             ],
           ),

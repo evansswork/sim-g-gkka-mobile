@@ -85,10 +85,8 @@ class _LoginProfilPageState extends State<LoginProfilPage> {
               BarisList(
                 ikon: Icons.lock_outline,
                 judul: 'Ganti kata sandi',
-                onTap: () => tampilkanPesan(
-                  context,
-                  'Fitur ganti kata sandi akan segera tersedia.',
-                ),
+                onTap: () =>
+                    Navigator.of(context).pushNamed('/ganti-kata-sandi'),
               ),
             ],
           ),
