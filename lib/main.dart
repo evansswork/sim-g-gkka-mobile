@@ -25,7 +25,7 @@ Future<void> main() async {
   };
 
   // cek sesi dijalankan di dalam splash supaya animasi langsung tampil
-  runApp(const MainApp(sudahLogin: true));
+  runApp(const MainApp(denganSplash: true));
 }
 
 class MainApp extends StatelessWidget {
