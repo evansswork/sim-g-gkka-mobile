@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'core/api.dart';
 import 'daftar.dart';
 import 'features/auth/auth_service.dart';
+import 'ganti_kata_sandi.dart';
 import 'masuk.dart';
 import 'pengaturan.dart';
 import 'splash.dart';
@@ -24,7 +25,7 @@ Future<void> main() async {
   };
 
   // cek sesi dijalankan di dalam splash supaya animasi langsung tampil
-  runApp(const MainApp(denganSplash: true));
+  runApp(const MainApp(sudahLogin: true));
 }
 
 class MainApp extends StatelessWidget {
@@ -57,6 +58,7 @@ class MainApp extends StatelessWidget {
           '/beranda': (_) => const TabShell(sudahLogin: false),
           '/login-beranda': (_) => const TabShell(sudahLogin: true),
           '/masuk': (_) => const MasukPage(),
+          '/ganti-kata-sandi': (_) => const GantiKataSandiPage(),
           '/daftar': (_) => const DaftarPage(),
           '/pengaturan': (context) => PengaturanPage(
             anggotaPelayanan:

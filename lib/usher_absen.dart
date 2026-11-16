@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'app_bottom_navigation.dart';
+import 'tab_shell.dart';
 
 const _ink = Color(0xFF102D2F);
 const _teal = Color(0xFF008080);
@@ -101,11 +102,6 @@ class _UsherAbsenPageState extends State<UsherAbsenPage> {
                   _buildBottomActions(),
                 ],
               ),
-            ),
-            const AppBottomNavigation(
-              currentIndex: 0,
-              homeRoute: '/login-beranda',
-              isLoggedIn: true,
             ),
           ],
         ),

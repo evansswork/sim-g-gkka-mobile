@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'app_bottom_navigation.dart';
 import 'usher_absen.dart';
 
 const _ink = Color(0xFF102D2F);
@@ -136,8 +135,6 @@ class UsherMainPage extends StatelessWidget {
                 style: TextStyle(color: _muted, fontSize: 7, height: 1.35),
               ),
             ),
-            const Spacer(),
-            const AppBottomNavigation(currentIndex: 0, isLoggedIn: true),
           ],
         ),
       ),
